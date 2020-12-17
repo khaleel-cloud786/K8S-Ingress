@@ -1,0 +1,33 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: nginx
+  name: ingress-demo-deploy-v2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: ingress-demo-deploy-v2
+  template:
+    metadata:
+      labels:
+        run: ingress-demo-deploy-v2
+    spec:
+      volumes:
+      - name: webdata
+        emptyDir: {}
+      initContainers:
+      - name: web-content
+        image: busybox
+        volumeMounts:
+        - name: webdata
+          mountPath: "/webdata"
+        command: ["/bin/sh", "-c", 'echo "<h1><font color=green>Welcome to Kubernetes - Khaleel Version! It is Ingress Demo version 2 !!!! </font></h1>" > /webdata/index.html']
+      containers:
+      - image: nginx
+        name: nginx
+        volumeMounts:
+        - name: webdata
+          mountPath: "/usr/share/nginx/html"
